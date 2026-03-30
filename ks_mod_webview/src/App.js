@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef } from "react";
 import ReactFlow, {
   addEdge,
   Background,
@@ -13,6 +13,7 @@ import "reactflow/dist/style.css";
 //Custom node
 import JointNode from "./nodes/JointNode";
 import LimbNode from "./nodes/limbNode";
+import RigPreview from "./components/RigPreview";
 
 const nodeTypes = {
   joint: JointNode,
@@ -37,13 +38,14 @@ const initialNodes = [
 const initialEdges = [];
 
 export default function App() {
+  const containerRef = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   //FIXED selection handling
   const [selectedNodeId, setSelectedNodeId] = useState(null);
 
-  const selectedNode = nodes.find((n) => n.id === selectedNodeId);
+  const selectedNode = nodes.find(n => n.id === selectedNodeId);
   const [menuPosition, setMenuPosition] = useState(null);
 
   const onConnect = useCallback(
@@ -152,109 +154,108 @@ export default function App() {
   
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      {/* Context Menu UI */}
-      {menuPosition && (
-        <div
-          style={{
-            position: "absolute",
-            top: menuPosition.y,
-            left: menuPosition.x,
-            background: "#333",
-            color: "white",
-            padding: 10,
-            borderRadius: 5,
-            zIndex: 20
-          }}
-        >
-          <div onClick={() => addNode("joint")}>➕ Add Joint</div>
-          <div onClick={() => addNode("limb")}>➕ Add Limb</div>
-        </div>
-      )}
-      {/* Build Maya Button */}
-      <button
-        onClick={buildInMaya}
-        style={{
-          position: "absolute",
-          zIndex: 10,
-          top: 50,
-          left: 10,
-          padding: "10px"
-        }}
-      >
-        Build in Maya
-      </button>
-      {/*Save Button */}
-      <button
-        onClick={saveRig}
-        style={{
-          position: "absolute",
-          zIndex: 10,
-          top: 10,
-          left: 10,
-          padding: "10px"
-        }}
-      >
-        Save Rig
-      </button>
+    <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
 
-      {/*Inspector Panel */}
-      {selectedNode && (
-        <div
-          style={{
+      {/* 🧊 LEFT: 3D Preview */}
+      <div style={{ width: "40%", height: "100%", borderRight: "1px solid #333" }}>
+        <RigPreview nodes={nodes} edges={edges} />
+      </div>
+
+      {/* 🧠 RIGHT: Node Editor */}
+      <div
+        ref={containerRef}
+        style={{ width: "60%", height: "100%", position: "relative" }}
+      >
+        
+        {/* Buttons */}
+        <button
+          onClick={saveRig}
+          style={{ position: "absolute", zIndex: 10, top: 10, left: 10 }}
+        >
+          Save
+        </button>
+
+        <button
+          onClick={buildInMaya}
+          style={{ position: "absolute", zIndex: 10, top: 50, left: 10 }}
+        >
+          Build
+        </button>
+
+        {/* Inspector */}
+        {selectedNode && (
+          <div style={{
             position: "absolute",
             right: 10,
             top: 10,
             background: "#222",
             color: "white",
             padding: 10,
-            borderRadius: 5,
             zIndex: 10
+          }}>
+            <h3>Inspector</h3>
+
+            <label>Name:</label>
+            <input
+              value={selectedNode.data.name || ""}
+              onChange={(e) => {
+                const newName = e.target.value;
+
+                setNodes((nds) =>
+                  nds.map((n) =>
+                    n.id === selectedNodeId
+                      ? { ...n, data: { ...n.data, name: newName } }
+                      : n
+                  )
+                );
+              }}
+            />
+          </div>
+        )}
+
+        {/* React Flow */}
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={(event, node) => setSelectedNodeId(node.id)}
+          onPaneContextMenu={(event) => {
+            event.preventDefault();
+
+            const bounds = containerRef.current.getBoundingClientRect();
+
+            const x = Math.min(event.clientX - bounds.left, bounds.width - 150);
+            const y = Math.min(event.clientY - bounds.top, bounds.height - 100);
+
+            setMenuPosition({ x, y });
           }}
+          fitView
         >
-          <h3>Inspector</h3>
+          <MiniMap />
+          <Controls />
+          <Background />
+        </ReactFlow>
 
-          <label>Name:</label>
-          <input
-            value={selectedNode.data.name || ""}
-            onChange={(e) => {
-              const newName = e.target.value;
+        {/* Context Menu */}
+        {menuPosition && (
+          <div style={{
+            position: "absolute",
+            top: menuPosition.y,
+            left: menuPosition.x,
+            background: "#333",
+            color: "white",
+            padding: 10,
+            zIndex: 20
+          }}>
+            <div onClick={() => addNode("joint")}>➕ Joint</div>
+            <div onClick={() => addNode("limb")}>➕ Limb</div>
+          </div>
+        )}
 
-              setNodes((nds) =>
-                nds.map((n) =>
-                  n.id === selectedNodeId
-                    ? { ...n, data: { ...n.data, name: newName } }
-                    : n
-                )
-              );
-            }}
-          />
-        </div>
-      )}
-
-      {/*React Flow Canvas */}
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeClick={(event, node) => setSelectedNodeId(node.id)}
-        onPaneContextMenu={(event) => {
-          event.preventDefault();
-
-          setMenuPosition({
-            x: event.clientX,
-            y: event.clientY
-          });
-        }}
-        fitView
-      >
-        <MiniMap />
-        <Controls />
-        <Background />
-      </ReactFlow>
+      </div>
     </div>
   );
 }
