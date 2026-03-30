@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ks-mod-rigging"
+version = "0.1.0"
+description = "A rigging module"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ks_mod_rigging*"]

@@ -1,0 +1,7 @@
+{
+    "python.testing.pytestArgs": [
+        "ks_mod_rigging"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

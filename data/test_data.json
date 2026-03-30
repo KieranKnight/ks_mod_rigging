@@ -1,0 +1,1 @@
+{"nodes":[{"id":"1","type":"joint","name":"root","params":{"position":[100,100,0]}},{"id":"2","type":"joint","name":"arm_L","params":{"position":[300,200,0]}},{"id":"3","type":"limb","name":"limb_3","params":{"side":"C","joint_count":3,"length":5.0}}],"connections":[]}
