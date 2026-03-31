@@ -1,0 +1,66 @@
+{
+  "nodes": [
+    {
+      "rig_id": "1",
+      "type": "joint",
+      "name": "Shoulder",
+      "params": {
+        "position": [
+          125.97908041329856,
+          75.03774150348686,
+          0
+        ]
+      }
+    },
+    {
+      "rig_id": "2",
+      "type": "joint",
+      "name": "Elbow",
+      "params": {
+        "position": [
+          91.7680072199567,
+          168.97823250687392,
+          0
+        ]
+      }
+    },
+    {
+      "rig_id": "3",
+      "type": "joint",
+      "name": "Wrist",
+      "params": {
+        "position": [
+          102.87385983495591,
+          275.6277097334724,
+          0
+        ]
+      }
+    },
+    {
+      "rig_id": "4",
+      "type": "joint",
+      "name": "Node 4",
+      "params": {
+        "position": [
+          312.60542466303764,
+          295.14626116434283,
+          0
+        ]
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "1",
+      "to": "2"
+    },
+    {
+      "from": "2",
+      "to": "3"
+    },
+    {
+      "from": "3",
+      "to": "4"
+    }
+  ]
+}

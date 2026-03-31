@@ -1,0 +1,29 @@
+{
+  "nodes": [
+    {
+      "rig_id": "1",
+      "type": "joint",
+      "name": "root",
+      "params": {
+        "position": [
+          100,
+          100,
+          0
+        ]
+      }
+    },
+    {
+      "rig_id": "2",
+      "type": "joint",
+      "name": "arm_L",
+      "params": {
+        "position": [
+          300,
+          200,
+          0
+        ]
+      }
+    }
+  ],
+  "connections": []
+}
